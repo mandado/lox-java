@@ -1,3 +1,21 @@
 #Lox java
 
 this a version java of lox languagem from book https://craftinginterpreters.com/
+
+
+BNF DIAGRAM
+
+
+```BNF
+expression     → literal
+               | unary
+               | binary
+               | grouping ;
+
+literal        → NUMBER | STRING | "true" | "false" | "nil" ;
+grouping       → "(" expression ")" ;
+unary          → ( "-" | "!" ) expression ;
+binary         → expression operator expression ;
+operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
+               | "+"  | "-"  | "*" | "/" ;
+```
