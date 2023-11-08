@@ -5,7 +5,7 @@ import Lox.Token;
 import java.util.List;
 
 public abstract class Expr {
-  interface Visitor<R> {
+   public interface Visitor<R> {
     R visitBinaryExpr(Binary expr);
     R visitGroupingExpr(Grouping expr);
     R visitLiteralExpr(Literal expr);
@@ -19,13 +19,13 @@ public abstract class Expr {
     }
 
     @Override
-    <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(Visitor<R> visitor) {
       return visitor.visitBinaryExpr(this);
     }
 
-    final Expr left;
-    final Token operator;
-    final Expr right;
+    final public Expr left;
+    final public Token operator;
+    final public Expr right;
   }
   public static class Grouping extends Expr {
     public Grouping(Expr expression) {
@@ -33,11 +33,11 @@ public abstract class Expr {
     }
 
     @Override
-    <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(Visitor<R> visitor) {
       return visitor.visitGroupingExpr(this);
     }
 
-    final Expr expression;
+    final public Expr expression;
   }
   public static class Literal extends Expr {
     public Literal(Object value) {
@@ -45,11 +45,11 @@ public abstract class Expr {
     }
 
     @Override
-    <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(Visitor<R> visitor) {
       return visitor.visitLiteralExpr(this);
     }
 
-    final Object value;
+    final public Object value;
   }
   public static class Unary extends Expr {
     public Unary(Token operator, Expr right) {
@@ -58,13 +58,13 @@ public abstract class Expr {
     }
 
     @Override
-    <R> R accept(Visitor<R> visitor) {
+    public <R> R accept(Visitor<R> visitor) {
       return visitor.visitUnaryExpr(this);
     }
 
-    final Token operator;
-    final Expr right;
+    final public Token operator;
+    final public Expr right;
   }
 
-  abstract <R> R accept(Visitor<R> visitor);
+  public abstract <R> R accept(Visitor<R> visitor);
 }

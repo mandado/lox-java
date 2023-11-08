@@ -14,6 +14,13 @@ public class Main {
                 new Expr.Grouping(
                         new Expr.Literal(45.67)));
 
-        System.out.println(new Printer().print(expression));
+
+        String printer = new Printer().print(
+                new Expr.Unary(
+                        new Token(TokenType.MINUS, "-", null, 1),
+                        new Expr.Literal(123))
+        );
+
+        System.out.println(printer);
     }
 }

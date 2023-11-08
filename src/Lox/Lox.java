@@ -1,5 +1,8 @@
 package Lox;
 
+import Lox.Ast.Expr;
+import Lox.Ast.Printer;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,10 +10,13 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.MessageFormat;
 import java.util.List;
 
 public class Lox {
+    private static final Interpreter interpreter = new Interpreter();
     static boolean hadError = false;
+    static boolean hasRuntimeErrror = false;
 
     public static void main(String[] args) throws Exception {
         if (args.length > 1) {
@@ -41,6 +47,7 @@ public class Lox {
 
         run(new String(bytes, Charset.defaultCharset()));
         if (hadError) System.exit(65);
+        if(hasRuntimeErrror) System.exit(70);
 
     }
 
@@ -50,12 +57,22 @@ public class Lox {
 
         // For now, just print the tokens.
         for (Token token : tokens) {
-            System.out.println(token);
+            Parser parser = new Parser(tokens);
+            Expr expression = parser.parse();
+
+            // Stop if there was a syntax error.
+            if (hadError) return;
+
+            interpreter.interpret(expression);
         }
     }
 
-    static void error(int line, String message) {
-        report(line, "", message);
+    static void error(Token token, String message) {
+        if (token.type == TokenType.EOF) {
+            report(token.line, " at end", message);
+        } else {
+            report(token.line, String.format("at '%s'", token.lexeme), message);
+        }
     }
 
     private static void report(int line, String where,
@@ -63,5 +80,11 @@ public class Lox {
         System.err.println(
                 "[line " + line + "] Error" + where + ": " + message);
         hadError = true;
+    }
+
+    public static void runtimeError(RuntimeError error) {
+        System.err.println(String.format("%s\n[line %s ]", error.getMessage(), error.token.line));
+
+        hasRuntimeErrror = true;
     }
 }
