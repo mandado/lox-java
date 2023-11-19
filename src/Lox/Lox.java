@@ -1,16 +1,13 @@
 package Lox;
 
-import Lox.Ast.Expr;
-import Lox.Ast.Printer;
+import Lox.Ast.Stmt;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.nio.charset.Charset;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.text.MessageFormat;
 import java.util.List;
 
 public class Lox {
@@ -58,12 +55,12 @@ public class Lox {
         // For now, just print the tokens.
         for (Token token : tokens) {
             Parser parser = new Parser(tokens);
-            Expr expression = parser.parse();
+            List<Stmt> statements = parser.parse();
 
             // Stop if there was a syntax error.
             if (hadError) return;
 
-            interpreter.interpret(expression);
+            interpreter.interpret(statements);
         }
     }
 

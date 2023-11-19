@@ -7,15 +7,32 @@ BNF DIAGRAM
 
 
 ```BNF
-expression     → literal
+program        → declaration* EOF ;
+
+declaration    → varDecl
+               | statement ;
+
+statement      → exprStmt
+               | printStmt ;
+
+exprStmt       → expression ";" ;
+
+printStmt      → "print" expression ";" ;
+varDecl        → "var" IDENTIFIER ( "=" expression )? ";" ;
+
+expression     → primary
                | unary
                | binary
                | grouping ;
 
-literal        → NUMBER | STRING | "true" | "false" | "nil" ;
-grouping       → "(" expression ")" ;
-unary          → ( "-" | "!" ) expression ;
-binary         → expression operator expression ;
-operator       → "==" | "!=" | "<" | "<=" | ">" | ">="
-               | "+"  | "-"  | "*" | "/" ;
+equality   → comparison ( ( "!=" | "==" ) comparison )* ;
+comparison → term ( ( ">" | ">=" | "<" | "<=" ) term )* ;
+term       → factor ( ( "-" | "+" ) factor )* ;
+factor     → unary ( ( "/" | "*" ) unary )* ;
+unary      → ( "!" | "-" | "--" | "++" ) unary
+           | postfix ;
+postfix    → primary ( "--" | ++" )* ;
+primary    → NUMBER | STRING | "true" | "false" | "nil"
+           | "(" expression ")"
+           | IDENTIFIER ;
 ```

@@ -129,7 +129,7 @@ public class Scanner {
                     identifier();
                 }
                 else {
-                    Lox.error(line, "unexpected character.");
+                    // Lox.error(line, "unexpected character.");
                 }
                 break;
         }
@@ -185,7 +185,7 @@ public class Scanner {
         }
 
         if (isAtEnd()) {
-            Lox.error(line, "Unterminated string");
+            // Lox.error(line, "Unterminated string");
             return;
         }
 

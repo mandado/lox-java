@@ -1,7 +1,9 @@
 package Lox;
 
 import Lox.Ast.Expr;
+import Lox.Ast.Stmt;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static Lox.TokenType.*;
@@ -14,12 +16,60 @@ public class Parser {
         this.tokens = tokens;
     }
 
-    Expr parse() {
+    List<Stmt> parse() {
+        List<Stmt> statements = new ArrayList<>();
+
+        while (!isAtEnd()) {
+            statements.add(declaration());
+        }   
+        return statements;
+    }
+
+    private Stmt declaration() {
         try {
-            return expression();
-        } catch (ParserError error) {
+            if (match(VAR)) return varDeclaration();
+
+            return statement();
+        } catch (ParseError error) {
+            synchronize();
             return null;
         }
+    }
+
+    private Stmt varDeclaration() {
+        Token name = consume(IDENTIFIER, "Expect variable name");
+
+        Expr initializer = null;
+
+        if (match(EQUAL)) {
+            initializer = expression();
+        }
+
+        consume(SEMICOLON, "Expect ';' after variable declaration.");
+        return new Stmt.Var(name, initializer);
+    }
+
+
+    private Stmt statement() {
+        if (match(PRINT)) return printStatement();
+
+        return expressionStatement();
+    }
+
+    private Stmt expressionStatement() {
+        Expr value = expression();
+
+        consume(SEMICOLON, "Expected ';' after");
+
+        return new Stmt.Expression(value);
+    }
+
+    private Stmt printStatement() {
+        Expr value = expression();
+
+        consume(SEMICOLON, "Expected ';' after");
+
+        return new Stmt.Print(value);
     }
 
     private Expr expression() {
@@ -106,6 +156,10 @@ public class Parser {
             return new Expr.Grouping(expr);
         }
 
+        if (match(IDENTIFIER)) {
+            return new Expr.Variable(previous());
+        }
+
         throw error(peek(), "Expect expression.");
     }
 
@@ -115,9 +169,9 @@ public class Parser {
         throw error(peek(), message);
     }
 
-    private ParserError error(Token token, String message) {
+    private ParseError error(Token token, String message) {
         Lox.error(token, message);
-        return new ParserError();
+        return new ParseError();
     }
 
     private boolean match(TokenType... types) {
@@ -156,7 +210,7 @@ public class Parser {
         return tokens.get(current - 1);
     }
 
-    private void syncronize() {
+    private void synchronize() {
         advance();
 
         while (!isAtEnd()) {
@@ -178,6 +232,6 @@ public class Parser {
         }
     }
 
-    private static class ParserError extends RuntimeException{
+    private static class ParseError extends RuntimeException{
     }
 }
